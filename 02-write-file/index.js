@@ -6,6 +6,10 @@ fs.writeFile(path.join(__dirname, 'text.txt'), '', () => {
   stdout.write('Приветствую Вас! Пожалуйста, введите Ваше имя ->   ');
 
   stdin.on('data', (data) => {
+    if (data.toString().trim() === 'exit'){
+      stdout.write('Благодарю за предоставленную информацию!');
+      process.exit(0);
+    }
     fs.appendFile(
       path.join(__dirname, 'text.txt'),
       data.toString(),
