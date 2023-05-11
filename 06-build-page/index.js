@@ -11,31 +11,30 @@ fs.readdir(__dirname, (err, fills) => {
       const html = fs.createWriteStream(path.join(__dirname, 'project-dist', 'index.html'));
       const style = fs.createWriteStream(path.join(__dirname, 'project-dist', 'style.css'));
     
-      const header = fs.createReadStream(path.join(__dirname, 'components', 'header.html'), 'utf8');
-      const articles = fs.createReadStream(path.join(__dirname, 'components', 'articles.html'), 'utf8');
-      const footer = fs.createReadStream(path.join(__dirname, 'components', 'footer.html'), 'utf8');
-      const about = fs.createReadStream(path.join(__dirname, 'components', 'about.html'), 'utf8');
       let template = fs.createReadStream(path.join(__dirname, 'template.html'), 'utf8');
     
-      header.on('data', headerInner => {
-        template.on('data', templatInner => {
-          const template2 = templatInner.toString().replace(/{{header}}/g, headerInner.toString());
-          articles.on('data', articlesInner => {
-            const template3 = template2.replace(/{{articles}}/g, articlesInner.toString());
-            footer.on('data', footerInner => {
-              const template4 = template3.replace(/{{footer}}/g, footerInner.toString());
-              fs.readdir(path.join(__dirname, 'components'), (err, all) => {
-                if (err) throw err;
-                if (all.length >= 4) {
-                  about.on('data', aboutInner => {
-                    const template5 = template4.replace(/{{about}}/g, aboutInner.toString());
-                    html.write(template5);
-                  })
-                } else { html.write(template4); }
-              })
+      fs.readdir(path.join(__dirname, 'components'), (err, components) => {
+        if (err) throw err;
+
+        let templateDubl = '';
+
+        components.forEach(component => {
+          const readComponent = fs.createReadStream(path.join(__dirname, 'components', component), 'utf8');
+          const regStrComponent = `{{${component.slice(0, -5)}}}`;
+          const regComponent = new RegExp(regStrComponent, 'g');
+
+          template.on('data', templateInner => {
+            templateDubl = templateInner.toString();
+
+            readComponent.on('data', readComponentInner => {
+              templateDubl = templateDubl.replace(regComponent, readComponentInner.toString());
+              if (component === components[components.length-1]) {
+                html.write(templateDubl);
+              }
+
             })
           })
-        })
+        });
       })
     
       fs.readdir(path.join(__dirname, 'styles'), (err, files) => {
@@ -77,30 +76,30 @@ fs.readdir(__dirname, (err, fills) => {
       const html = fs.createWriteStream(path.join(__dirname, 'project-dist', 'index.html'));
       const style = fs.createWriteStream(path.join(__dirname, 'project-dist', 'style.css'));
     
-      const header = fs.createReadStream(path.join(__dirname, 'components', 'header.html'), 'utf8');
-      const articles = fs.createReadStream(path.join(__dirname, 'components', 'articles.html'), 'utf8');
-      const footer = fs.createReadStream(path.join(__dirname, 'components', 'footer.html'), 'utf8');
       let template = fs.createReadStream(path.join(__dirname, 'template.html'), 'utf8');
     
-      header.on('data', headerInner => {
-        template.on('data', templatInner => {
-          const template2 = templatInner.toString().replace(/{{header}}/g, headerInner.toString());
-          articles.on('data', articlesInner => {
-            const template3 = template2.replace(/{{articles}}/g, articlesInner.toString());
-            footer.on('data', footerInner => {
-              const template4 = template3.replace(/{{footer}}/g, footerInner.toString());
-              fs.readdir(path.join(__dirname, 'components'), (err, all) => {
-                if (err) throw err;
-                if (all.length >= 4) {
-                  isAbsolute.on('data', aboutInner => {
-                    const template5 = template4.replace(/{{about}}/g, aboutInner.toString());
-                    html.write(template5);
-                  })
-                } else { html.write(template4); }
-              })
+      fs.readdir(path.join(__dirname, 'components'), (err, components) => {
+        if (err) throw err;
+
+        let templateDubl = '';
+
+        components.forEach(component => {
+          const readComponent = fs.createReadStream(path.join(__dirname, 'components', component), 'utf8');
+          const regStrComponent = `{{${component.slice(0, -5)}}}`;
+          const regComponent = new RegExp(regStrComponent, 'g');
+
+          template.on('data', templateInner => {
+            templateDubl = templateInner.toString();
+
+            readComponent.on('data', readComponentInner => {
+              templateDubl = templateDubl.replace(regComponent, readComponentInner.toString());
+              if (component === components[components.length-1]) {
+                html.write(templateDubl);
+              }
+
             })
           })
-        })
+        });
       })
     
       fs.readdir(path.join(__dirname, 'styles'), (err, files) => {
